@@ -52,6 +52,8 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
 .q-text{font-size:1.02rem;font-weight:600;line-height:1.55;margin-bottom:16px;color:var(--navy);}
 .options{display:flex;flex-direction:column;gap:9px;}
 .option{padding:11px 15px;border-radius:8px;border:2px solid var(--border);cursor:pointer;font-size:0.93rem;transition:all 0.15s;background:#fff;text-align:left;font-family:'Source Sans 3',sans-serif;width:100%;}
+.fill-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:0.97rem;font-family:'Source Sans 3',sans-serif;outline:none;transition:border-color 0.2s;background:#fff;margin-top:4px;}
+.fill-input:focus{border-color:var(--gold);}
 .option:hover:not([disabled]){border-color:var(--gold);background:#fffbf2;}
 .option.selected{border-color:var(--gold);background:#fffbf2;font-weight:600;}
 .option.correct-ans{border-color:var(--green)!important;background:#f0faf4!important;color:var(--green)!important;font-weight:600;}
@@ -93,13 +95,22 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
 .all-done-card h2{font-family:'Playfair Display',serif;color:var(--gold2);font-size:1.8rem;margin-bottom:10px;}
 .all-done-card p{color:#a8bcd0;line-height:1.6;}
 @media(max-width:520px){.welcome-card{padding:28px 20px;}.welcome-card h2{font-size:1.6rem;}.test-grid{grid-template-columns:1fr;}}
+
+.reading-header{background:var(--navy);border-radius:18px;padding:32px;text-align:center;color:var(--cream);margin-bottom:24px;}
+.reading-header h2{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold2);margin-bottom:8px;}
+.reading-header p{color:#a8bcd0;font-size:0.92rem;}
+.reading-section{background:var(--card);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.reading-section-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--gold);display:inline-block;}
+.reading-section p{font-size:0.93rem;line-height:1.7;color:#2a3a4a;}
+.reading-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px;}
+.reading-list li{font-size:0.92rem;line-height:1.6;color:#2a3a4a;padding-left:14px;border-left:3px solid var(--gold);padding:8px 8px 8px 14px;background:var(--offwhite);border-radius:0 6px 6px 0;}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div>
-    <div class="header-title">🌾 The Silo</div>
+    <div class="header-title"><img src="data:image/png;base64,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" style="height:36px;vertical-align:middle;" alt="The Silo"/></div>
     <div class="header-sub" id="headerSub">Staff Training Quiz</div>
   </div>
   <div style="text-align:right">
@@ -111,7 +122,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
 <!-- WELCOME -->
 <div class="screen active" id="screenWelcome">
   <div class="welcome-card">
-    <div class="silo-icon">🏭</div>
+    <div class="silo-icon"><img src="data:image/png;base64,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" style="height:80px;" alt="The Silo"/></div>
     <h2>Welcome to The Silo</h2>
     <p>Complete your staff training quiz before your first shift.<br/>You need <strong style="color:var(--gold2)">85%</strong> or higher to pass each test.</p>
     <div class="badge-row">
@@ -142,6 +153,128 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
 </div>
 
 <!-- TEST SELECT -->
+
+<!-- READING PAGE -->
+<div class="screen" id="screenReading">
+  <div class="reading-header">
+    <img src="data:image/png;base64,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" style="height:60px;margin-bottom:16px;" alt="The Silo"/>
+    <h2>Staff Training Guide</h2>
+    <p>Read everything carefully before taking your test. You will be tested on this material.</p>
+  </div>
+
+  <div class="reading-section">
+    <div class="reading-section-title">🏭 Our Story</div>
+    <p>Our story begins in the 1930s, back when this area was referred to as <strong>"Hojack Country."</strong> The waterfront was bustling and alive with tourists visiting by the thousands, traveling the <strong>Great Gorge Railway</strong>. The Lewiston Silo was home to the coal that fueled these steamers, and played an important role in housing the fuel that kept the waterfront alive. Locals set up stands to sell souvenirs and novelty items to visitors.</p>
+    <p style="margin-top:10px;">The demise of the Great Gorge Railway in <strong>1938</strong>, the construction of a superhighway to Toronto, and excessive pollution strangling the river caused the waterfront activity to decline. An ice jam destroyed the terminal and The Silo sat alone, bearing witness to the piling of sand dredged from the river bottom and the quiet sounds of pigeons roosting in the top of the decaying superstructure.</p>
+    <p style="margin-top:10px;">In <strong>1998</strong>, The Silo was reborn as a restaurant and has become a beloved local landmark known for <strong>quick service, Haystacks, friendly staff, and clean dining.</strong></p>
+  </div>
+
+  <div class="reading-section">
+    <div class="reading-section-title">⭐ The Haystack</div>
+    <p>The Haystack is our signature item — <strong>steak and mozzarella cheese in a hoagie roll with crunchy hash browns on top and a little mayo in the roll.</strong> It was featured on <strong>Man vs. Food</strong> and put the Silo on the map. Being precise with every Haystack — the right amount of cheese, fully scraping cans — keeps food cost in check so we can pay our team better wages.</p>
+  </div>
+
+  <div class="reading-section">
+    <div class="reading-section-title">🤝 Customer Service — The Silo Standard</div>
+    <ul class="reading-list">
+      <li><strong>Always greet every customer.</strong> When someone walks in: <em>"Hi, welcome to the Silo, how can I help you?"</em> — no exceptions.</li>
+      <li><strong>Never ignore a passing customer.</strong> If they're eating, ask how everything is. A simple acknowledgment makes people feel valued.</li>
+      <li><strong>Move with urgency.</strong> Walk quickly to the register when you see a customer. Short lines are a top priority — long lines lose business.</li>
+      <li><strong>Upsell every order.</strong> Ask if they'd like to make it a meal with fries and a drink. It helps the business and gives customers a better experience.</li>
+      <li><strong>A smile goes a long way.</strong> Make eye contact. Be warm. Customers remember how you made them feel more than anything else.</li>
+      <li><strong>Handle complaints with grace.</strong> Listen fully, apologize sincerely, and get a manager. Never argue, never dismiss. One bad experience can cost us many customers.</li>
+      <li><strong>Anticipate needs.</strong> Refill napkins before they run out. Notice a dirty table before a customer has to sit at it. Be one step ahead.</li>
+      <li><strong>The milkshake handoff.</strong> Always explain the caboose process: <em>"Your milkshake will be made at our ice cream caboose — go right over, your buzzer will ring and they'll call it out the window. You do not need to wait in line."</em></li>
+      <li><strong>Family and friends visiting?</strong> Give them 10% off their order.</li>
+      <li><strong>The customer's last impression matters as much as the first.</strong> A friendly goodbye and a clean table make people come back.</li>
+    </ul>
+  </div>
+
+  <div class="reading-section">
+    <div class="reading-section-title">📋 Workplace Policies</div>
+    <ul class="reading-list">
+      <li><strong>Phone use:</strong> On break only. Never on the cook line or in front of customers.</li>
+      <li><strong>Hair:</strong> Tight bun — no flyaways, no ponytails.</li>
+      <li><strong>Breaks:</strong> Outside tables only. No smoking or vaping anywhere on property — you will be written up. No leaving the premises while on the clock.</li>
+      <li><strong>NYS meal break:</strong> A 30-minute unpaid meal break is required for shifts over 6 consecutive hours.</li>
+      <li><strong>Overtime:</strong> Do not pick up shifts past 40 hours without checking with a manager first.</li>
+      <li><strong>No call no shows:</strong> Not acceptable. Find a cover and notify a manager. Failure to do so results in a write-up with possible termination.</li>
+      <li><strong>Complaints / hours / pay:</strong> Talk to Lexi directly — never to coworkers.</li>
+      <li><strong>Nothing on the ground:</strong> Everything on a shelf — including boxes.</li>
+      <li><strong>Closing:</strong> 40 minutes. Everyone off the clock within an hour of closing.</li>
+      <li><strong>Every sink (including bathrooms):</strong> Must have soap, paper towels, and hot water per NYS law.</li>
+      <li><strong>Downtime:</strong> Find something to clean, organize, or restock. Never stand around.</li>
+      <li><strong>Mental health:</strong> Don't pick up shifts on your day off. Go for a walk, do something you enjoy, drink water. We care about you outside of work too.</li>
+    </ul>
+  </div>
+
+  <div class="reading-section">
+    <div class="reading-section-title">🔄 Stocking & Cleanliness</div>
+    <ul class="reading-list">
+      <li><strong>Every station:</strong> Bleach bucket with half cap bleach, warm water, and its own rag.</li>
+      <li><strong>Stocking rule:</strong> Oldest to the front, newest to the back — always. Beer, custard, bread bags, everything.</li>
+      <li><strong>Before leaving any shift:</strong> Stock, clean, and change garbage. Bring up low ice cream, cheese, beer, etc. Reset everything for the next shift.</li>
+      <li><strong>Closing:</strong> Restock all food, all coolers, low ice cream, all paper products. Floors and counters spotless — even under equipment.</li>
+    </ul>
+  </div>
+
+  <div class="reading-section" id="readingKitchen" style="display:none;">
+    <div class="reading-section-title">🍳 Kitchen</div>
+    <ul class="reading-list">
+      <li><strong>Temps:</strong> Chicken 165°F · Ground beef 160°F · Pork 145°F · All coolers below 40°F</li>
+      <li><strong>Danger zone:</strong> 40°F–140°F. Food cannot sit in this range for more than 2 hours.</li>
+      <li><strong>Fridge order:</strong> Cheese on top → items by cook time → chicken alone on the very bottom.</li>
+      <li><strong>Thawing:</strong> Cold running water or in the fridge early. Never leave out in the basement.</li>
+      <li><strong>Gloves:</strong> Change after touching raw meat, and whenever soiled or contaminated.</li>
+      <li><strong>Squirt bottles:</strong> All must be labeled — even water.</li>
+      <li><strong>Arriving:</strong> Personal items away → hair net → wash hands.</li>
+      <li><strong>Grill/flat top:</strong> Manual scrubbing, no chemicals. Charcoal brick on flat top. Scraping and scrubbing on grill.</li>
+      <li><strong>Bread pull:</strong> Morning pull based on weather — lower on bad weather days.</li>
+      <li><strong>Produce turning:</strong> Never throw it out without telling a manager. Text Lexi — we may get supplier credits.</li>
+      <li><strong>Illness:</strong> Report vomiting, diarrhea, jaundice, or diagnosed illness to a manager before handling food.</li>
+    </ul>
+  </div>
+
+  <div class="reading-section" id="readingRegister" style="display:none;">
+    <div class="reading-section-title">🖥️ Register</div>
+    <ul class="reading-list">
+      <li><strong>Greeting:</strong> "Hi, welcome to the Silo, how can I help you?"</li>
+      <li><strong>Two main focuses:</strong> Clean tables and short lines — then sweep deck, clean condiment stations, change garbage.</li>
+      <li><strong>Upsell:</strong> Ask every customer if they want to make it a meal with fries and a drink.</li>
+      <li><strong>Milkshake process:</strong> Always explain the caboose. They do not wait in line again.</li>
+      <li><strong>Refunds:</strong> Always get a manager — never process without approval.</li>
+      <li><strong>Tips:</strong> Counted as the very last step. The person counting must be off the clock.</li>
+    </ul>
+  </div>
+
+  <div class="reading-section" id="readingCaboose" style="display:none;">
+    <div class="reading-section-title">🍦 Ice Cream / Caboose</div>
+    <ul class="reading-list">
+      <li><strong>Scoop consistency:</strong> Same size as your coworker. Every customer gets the same experience.</li>
+      <li><strong>Custard thawing:</strong> Put in fridge early whenever there are open spots.</li>
+      <li><strong>Machine running low:</strong> Fill with fully thawed custard.</li>
+      <li><strong>Milkshake from inside:</strong> Make immediately, call on pager, call out LOUDLY through the window.</li>
+      <li><strong>Greetings:</strong> "Hi! How can I help you?" / "Sorry it's so loud, what was that?" / "Anything else today?"</li>
+      <li><strong>Tips:</strong> Counted as the very last step. The person counting must be off the clock.</li>
+    </ul>
+  </div>
+
+  <div class="reading-section">
+    <div class="reading-section-title">🎁 Employee Perks</div>
+    <ul class="reading-list">
+      <li><strong>Discount on day of work:</strong> 50% off kitchen or ice cream.</li>
+      <li><strong>Free beverage:</strong> From the soda machine using your employee cup.</li>
+      <li><strong>Free french fries</strong> on your shift.</li>
+      <li><strong>Friends & family:</strong> 10% off their order when you're working.</li>
+    </ul>
+  </div>
+
+  <div style="text-align:center;margin-top:32px;padding-bottom:12px;">
+    <p style="color:var(--muted);font-size:0.88rem;margin-bottom:16px;">By tapping the button below you confirm you have read and understood everything above.</p>
+    <button class="btn btn-gold" onclick="beginTestFromReading()" style="font-size:1.1rem;padding:16px 40px;">I've Read Everything — Begin Test ➜</button>
+  </div>
+</div>
+
 <div class="screen" id="screenSelect">
   <div style="margin-bottom:6px;color:var(--muted);font-size:0.88rem;" id="greetingLine"></div>
   <h2 class="section-title">Your Training Test</h2>
@@ -209,7 +342,14 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
 // ═══════════════════════════════════════════════
 
 const GENERAL = [
-  {q:"What was the Silo originally used for?",type:"mc",options:["A grain storage facility","A coal silo — steamships pulled up to load their ships","A water tower","A lumber yard"],answer:"A coal silo — steamships pulled up to load their ships"},
+  {q:"What was the Silo originally used for?",type:"mc",options:["A grain storage facility","A coal silo that fueled steamships on the waterfront","A water tower","A lumber yard"],answer:"A coal silo that fueled steamships on the waterfront"},
+  {q:"What decade does the Silo story begin in?",type:"mc",options:["The 1900s","The 1920s","The 1930s","The 1950s"],answer:"The 1930s"},
+  {q:"What was this area referred to as in the 1930s?",type:"mc",options:["The Frontier Zone","The Great River District","Hojack Country","The Niagara Strip"],answer:"Hojack Country"},
+  {q:"What railway brought thousands of tourists to the waterfront?",type:"mc",options:["The Niagara Falls Railway","The Great Gorge Railway","The Lewiston Line","The Frontier Express"],answer:"The Great Gorge Railway"},
+  {q:"What did the Lewiston Silo store that fueled the steamships?",type:"mc",options:["Grain","Oil","Wood","Coal"],answer:"Coal"},
+  {q:"When did the Great Gorge Railway come to an end?",type:"mc",options:["1925","1930","1938","1945"],answer:"1938"},
+  {q:"What three things caused the waterfront activity to decline?",type:"mc",options:["A flood, a fire, and a recession","The demise of the Great Gorge Railway, construction of a superhighway to Toronto, and excessive pollution strangling the river","A hurricane, overcrowding, and high taxes","Loss of tourism, road closures, and a government takeover"],answer:"The demise of the Great Gorge Railway, construction of a superhighway to Toronto, and excessive pollution strangling the river"},
+  {q:"What destroyed the terminal after the waterfront declined?",type:"mc",options:["A fire","A flood","An ice jam","A storm"],answer:"An ice jam"},
   {q:"What year did the Silo open as a restaurant?",type:"mc",options:["1985","1992","1998","2003"],answer:"1998"},
   {q:"What is the Silo best known for in the community?",type:"mc",options:["Fine dining and wine","Quick service, Haystacks, friendly staff, and clean dining","All-you-can-eat buffets","Late-night food only"],answer:"Quick service, Haystacks, friendly staff, and clean dining"},
   {q:"What is a Haystack?",type:"mc",options:["Pulled pork on a brioche bun with coleslaw","A chicken sandwich with waffle fries on top","Steak and mozzarella cheese in a hoagie roll with crunchy hash browns on top and a little mayo in the roll","A burger with fried onion strings and special sauce"],answer:"Steak and mozzarella cheese in a hoagie roll with crunchy hash browns on top and a little mayo in the roll"},
@@ -238,7 +378,14 @@ const GENERAL = [
   {q:"What must you do before you leave every shift — regardless of opening or closing?",type:"mc",options:["Clock out and let the next shift figure it out","Just clean your personal station","Stock, clean, and change garbage. Bring up low ice cream, cheese, beer, etc. Everything must be reset, refilled, and cleaned for the next shift","Only closing staff needs to restock"],answer:"Stock, clean, and change garbage. Bring up low ice cream, cheese, beer, etc. Everything must be reset, refilled, and cleaned for the next shift"},
   {q:"What is a big part of closing?",type:"mc",options:["Counting the register and going home","Restocking — all food, all coolers, low ice cream, all paper products. Floors and counters must be spotless, even under equipment","Locking up and turning off lights","Writing the next day's schedule"],answer:"Restocking — all food, all coolers, low ice cream, all paper products. Floors and counters must be spotless, even under equipment"},
   {q:"Why is it important to restock before you leave even if you're not the closing shift?",type:"mc",options:["It's not important — only closers need to worry about it","So the next shift is never scrambling — a well-stocked station sets the whole team up for success","It's only required during busy season","Managers will restock after you leave"],answer:"So the next shift is never scrambling — a well-stocked station sets the whole team up for success"},
-  {q:"What must be at every sink, including bathrooms, per NYS law?",type:"mc",options:["Hand sanitizer and a towel rack","Soap, paper towels, and hot water","Soap and cold water","A sanitizer dispenser and gloves"],answer:"Soap, paper towels, and hot water"}
+  {q:"What must be at every sink, including bathrooms, per NYS law?",type:"mc",options:["Hand sanitizer and a towel rack","Soap, paper towels, and hot water","Soap and cold water","A sanitizer dispenser and gloves"],answer:"Soap, paper towels, and hot water"},
+  {q:"Why is clocking in and out at the exact time you begin and end work important?",type:"mc",options:["So the manager knows you arrived on time","It helps with scheduling future shifts","NYS has strict labor laws and the business must ensure it is compliant","It only matters for full-time employees"],answer:"NYS has strict labor laws and the business must ensure it is compliant"},
+  {q:"Name three things you can do when you do not have a current order.",type:"fill",answer:"clean organize restock"},
+  {q:"What should you do if you are unhappy with your hours, pay, or have a complaint?",type:"mc",options:["Post about it in the group chat","Talk to coworkers to get their opinions","Wait until your next performance review","Talk to Lexi directly — not to coworkers"],answer:"Talk to Lexi directly — not to coworkers"},
+  {q:"What do you do when there are no current orders or customers?",type:"mc",options:["Stand by the register and wait","Walk around or chat with a coworker","Take a break since it is slow","Find something to clean, organize, or restock — never stand around"],answer:"Find something to clean, organize, or restock — never stand around"},
+  {q:"What is the employee discount?",type:"mc",options:["20% off your entire order any time","50% off food on your day off plus a free drink","50% off kitchen or ice cream on the day you work, free beverage from the soda machine using your employee cup, and free french fries","Free meal every shift, no restrictions"],answer:"50% off kitchen or ice cream on the day you work, free beverage from the soda machine using your employee cup, and free french fries"},
+  {q:"Your family or friends come to visit while you are working. What do you do?",type:"mc",options:["Give them whatever they want — you work here","Tell them to come back another time","Ask a manager to comp their meal","Give them 10% off their order"],answer:"Give them 10% off their order"},
+  {q:"What should you do if there is a fire in the kitchen?",type:"mc",options:["Pour water on any fire immediately","Run and find a manager right away","Always use the fire extinguisher regardless of size","Small grill fires: tiny controlled squirts of water. Grease fires: never use water — use the red fire blanket or small amounts of salt to smother the flame. Stay on your position and practice good grill management"],answer:"Small grill fires: tiny controlled squirts of water. Grease fires: never use water — use the red fire blanket or small amounts of salt to smother the flame. Stay on your position and practice good grill management"}
 ];
 
 const KITCHEN_ONLY = [
@@ -278,8 +425,7 @@ const REGISTER_ONLY = [
   {q:"Why is it important to explain the milkshake process to the customer?",type:"mc",options:["So they leave a better tip","So they don't get frustrated thinking they have to wait in a second line","It's a health code requirement","So they know it's freshly made"],answer:"So they don't get frustrated thinking they have to wait in a second line"},
   {q:"A customer looks confused after ordering a milkshake and starts walking toward the exit. What do you do?",type:"mc",options:["Let them go — they'll figure it out","Call out to them and proactively explain the caboose process before they leave","Page a manager","Tell the next customer in line"],answer:"Call out to them and proactively explain the caboose process before they leave"},
   {q:"A customer asks for a refund. What do you do?",type:"mc",options:["Process it immediately to avoid a scene","Tell them no refunds","Get a manager — never process a refund or make a promise without manager approval","Offer store credit instead"],answer:"Get a manager — never process a refund or make a promise without manager approval"},
-  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not register staff"],answer:"As the very last step — the person counting them must be off the clock"},
-  {q:"Why must the tip counter be off the clock when counting tips?",type:"mc",options:["It's just a preference","To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues","So they can leave faster","Tips aren't part of official payroll"],answer:"To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues"}
+  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not register staff"],answer:"As the very last step — the person counting them must be off the clock"}
 ];
 
 const CABOOSE_ONLY = [
@@ -296,8 +442,7 @@ const CABOOSE_ONLY = [
   {q:"What is the impact of running out of a custard flavor mid-rush?",type:"mc",options:["It's fine — customers understand","It disappoints customers, loses sales, and hurts the overall experience","Only affects revenue slightly","It's unavoidable and not worth worrying about"],answer:"It disappoints customers, loses sales, and hurts the overall experience"},
   {q:"Why is it important to keep your station clean during a rush?",type:"mc",options:["Only clean during slow periods","Food safety, customer perception, and health code compliance — a dirty station reflects on the whole business","Cleaning during a rush slows you down too much","Only the closing crew needs to worry about cleanliness"],answer:"Food safety, customer perception, and health code compliance — a dirty station reflects on the whole business"},
   {q:"Under NYS food safety rules, what temperature must dairy-based products like custard be kept at?",type:"mc",options:["Below 45°F","Below 41°F","Below 40°F","Below 38°F"],answer:"Below 40°F"},
-  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not caboose staff"],answer:"As the very last step — the person counting them must be off the clock"},
-  {q:"Why must the tip counter be off the clock when counting tips?",type:"mc",options:["It's just a preference","To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues","So they can leave faster","Tips aren't part of official payroll"],answer:"To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues"}
+  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not caboose staff"],answer:"As the very last step — the person counting them must be off the clock"}
 ];
 
 // ═══════════════════════════════════════════════
@@ -345,6 +490,15 @@ function startQuiz(){
   err.textContent='';
   empName=name; empPosition=pos; empWage=wage;
   document.getElementById('greetingLine').textContent='Logged in as: '+empName+' — '+TESTS[pos].label;
+  // Show position-specific reading sections
+  document.getElementById('readingKitchen').style.display=pos==='kitchen'?'block':'none';
+  document.getElementById('readingRegister').style.display=pos==='register'?'block':'none';
+  document.getElementById('readingCaboose').style.display=pos==='caboose'?'block':'none';
+  showScreen('screenReading');
+  setProgress(0,'Read the guide first');
+}
+
+function beginTestFromReading(){
   buildTestGrid();
   showScreen('screenSelect');
   setProgress(0,'');
@@ -388,9 +542,14 @@ function renderQuestions(){
     card.id='qcard-'+i;
     let inner=`<div class="q-num">Question ${i+1} of ${currentQuestions.length}</div>
                <div class="q-text">${q.q}</div>`;
-    inner+=`<div class="options">`+q.options.map((opt,oi)=>
-      `<button class="option" id="opt-${i}-${oi}" onclick="selectOption(${i},${oi},this)">${opt}</button>`
-    ).join('')+`</div>`;
+    if(q.type==='fill'){
+      inner+=`<input type="text" class="fill-input" id="fill-${i}" placeholder="Type your answer..." oninput="userAnswers[${i}]=this.value"/>`;
+      inner+=`<p style="font-size:0.8rem;color:var(--muted);margin-top:6px;">Include all key words in your answer.</p>`;
+    } else {
+      inner+=`<div class="options">`+q.options.map((opt,oi)=>
+        `<button class="option" id="opt-${i}-${oi}" onclick="selectOption(${i},${oi},this)">${opt}</button>`
+      ).join('')+`</div>`;
+    }
     inner+=`<div class="feedback" id="fb-${i}"></div>`;
     card.innerHTML=inner;
     container.appendChild(card);
@@ -409,13 +568,25 @@ function selectOption(qi,oi,el){
 // ═══════════════════════════════════════════════
 function submitQuiz(){
   const unanswered=[];
-  currentQuestions.forEach((_,i)=>{if(!userAnswers[i])unanswered.push(i+1);});
+  currentQuestions.forEach((q,i)=>{
+    const ans=q.type==='fill'?(document.getElementById('fill-'+i)?.value||'').trim():userAnswers[i];
+    if(!ans)unanswered.push(i+1);
+    if(q.type==='fill')userAnswers[i]=ans;
+  });
   if(unanswered.length>0){alert('Please answer all questions before submitting.\nUnanswered: Q'+unanswered.join(', Q'));return;}
   let correct=0;
   const details=[];
   currentQuestions.forEach((q,i)=>{
     const given=(userAnswers[i]||'').trim();
-    const isCorrect=given===q.answer;
+    let isCorrect=false;
+    if(q.type==='fill'){
+      const keywords=q.answer.toLowerCase().split(' ');
+      const givenLower=given.toLowerCase();
+      const matched=keywords.filter(k=>givenLower.includes(k));
+      isCorrect=matched.length>=2;
+    } else {
+      isCorrect=given===q.answer;
+    }
     if(isCorrect)correct++;
     details.push({question:q.q,given,correct:q.answer,isCorrect});
   });
