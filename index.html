@@ -630,8 +630,9 @@ function showResults(entry){
   const wrong=entry.details.filter(d=>!d.isCorrect);
   const right=entry.details.filter(d=>d.isCorrect);
   let html='';
-  if(!entry.passed&&wrong.length>0){
-    html+=`<h3 style="font-family:'Playfair Display',serif;margin:0 0 14px;color:var(--red);">❌ Incorrect — Study These (${wrong.length})</h3>`;
+  if(wrong.length>0){
+    html+=`<h3 style="font-family:'Playfair Display',serif;margin:0 0 14px;color:var(--red);">❌ Incorrect — You Must Correct These (${wrong.length})</h3>`;
+    html+=`<p style="color:var(--muted);font-size:0.88rem;margin-bottom:14px;">Review each answer below, then tap "Correct My Mistakes" to answer them again.</p>`;
     wrong.forEach(d=>{html+=`<div class="review-item"><div class="review-q">${d.question}</div><div class="review-your">Your answer: ${d.given||'(none)'}</div><div class="review-correct">✅ Correct: ${d.correct}</div></div>`;});
     html+=`<hr class="divider"/>`;
   }
@@ -639,9 +640,96 @@ function showResults(entry){
   right.forEach(d=>{html+=`<div class="review-item ok"><div class="review-q">${d.question}</div><div class="review-correct">✅ ${d.correct}</div></div>`;});
   review.innerHTML=html;
   const actions=document.getElementById('resultActions');
-  actions.innerHTML=entry.passed
-    ?`<button class="btn btn-green" onclick="goBack()">← Back to Tests</button>`
-    :`<button class="btn btn-gold" onclick="retryTest()">🔄 Retry Test</button><button class="btn btn-outline" onclick="goBack()">← Back</button>`;
+  if(wrong.length>0){
+    actions.innerHTML=`<button class="btn btn-gold" onclick="correctMistakes()">📝 Correct My Mistakes (${wrong.length})</button>`;
+  } else {
+    actions.innerHTML=`<button class="btn btn-green" onclick="goBack()">← Back to Tests</button>`;
+  }
+}
+
+function correctMistakes(){
+  const entry=results[results.length-1];
+  const wrongDetails=entry.details.filter(d=>!d.isCorrect);
+  const correctionQs=wrongDetails.map(d=>{
+    return currentQuestions.find(q=>q.q===d.question);
+  }).filter(Boolean);
+  const savedAll=currentQuestions;
+  currentQuestions=correctionQs;
+  userAnswers={};
+  showScreen('screenQuiz');
+  document.getElementById('quizTitle').textContent='Correct Your Mistakes';
+  document.getElementById('quizSubtitle').textContent=correctionQs.length+' questions to correct — you must get them all right';
+  const container=document.getElementById('questionsContainer');
+  container.innerHTML='';
+  correctionQs.forEach((q,i)=>{
+    let optHTML='';
+    if(q.type==='fill'){
+      optHTML=`<input type="text" class="fill-input" id="fill-${i}" placeholder="Type your answer..." autocomplete="off"/>`;
+    } else {
+      const shuffled=[...q.options].sort(()=>Math.random()-0.5);
+      shuffled.forEach(o=>{optHTML+=`<button class="option" onclick="pickOption(${i},this,'${o.replace(/'/g,"\\'")}')">${o}</button>`;});
+    }
+    container.innerHTML+=`<div class="question-card" id="qcard-${i}"><div class="q-num">Correction ${i+1} of ${correctionQs.length}</div><div class="q-text">${q.q}</div><div class="options">${optHTML}</div><div class="feedback" id="fb-${i}"></div></div>`;
+  });
+  const submitArea=document.getElementById('submitArea');
+  submitArea.innerHTML=`<button class="btn btn-gold" onclick="submitCorrections()" style="width:100%;padding:16px;font-size:1.05rem;">Submit Corrections ➜</button>`;
+  currentQuestions=correctionQs;
+  window._savedAllQuestions=savedAll;
+}
+
+function submitCorrections(){
+  const unanswered=[];
+  currentQuestions.forEach((q,i)=>{
+    const ans=q.type==='fill'?(document.getElementById('fill-'+i)?.value||'').trim():userAnswers[i];
+    if(!ans)unanswered.push(i+1);
+    if(q.type==='fill')userAnswers[i]=ans;
+  });
+  if(unanswered.length>0){alert('Please answer all questions.\nUnanswered: Q'+unanswered.join(', Q'));return;}
+  let allCorrect=true;
+  const stillWrong=[];
+  currentQuestions.forEach((q,i)=>{
+    const given=(userAnswers[i]||'').trim();
+    let isCorrect=false;
+    if(q.type==='fill'){
+      const keywords=q.answer.toLowerCase().split(' ');
+      const givenLower=given.toLowerCase();
+      const matched=keywords.filter(k=>givenLower.includes(k));
+      isCorrect=matched.length>=2;
+    } else {
+      isCorrect=given===q.answer;
+    }
+    const card=document.getElementById('qcard-'+i);
+    const fb=document.getElementById('fb-'+i);
+    if(isCorrect){
+      card.style.borderColor='var(--green)';
+      fb.className='feedback fb-correct';
+      fb.style.display='block';
+      fb.textContent='✅ Correct!';
+    } else {
+      allCorrect=false;
+      card.style.borderColor='var(--red)';
+      fb.className='feedback fb-wrong';
+      fb.style.display='block';
+      fb.innerHTML='❌ Incorrect — the correct answer is: <strong>'+q.answer+'</strong>';
+      stillWrong.push(q);
+    }
+    card.querySelectorAll('.option').forEach(btn=>btn.disabled=true);
+    const fillInput=document.getElementById('fill-'+i);
+    if(fillInput)fillInput.disabled=true;
+  });
+  if(allCorrect){
+    const submitArea=document.getElementById('submitArea');
+    submitArea.innerHTML=`<div style="background:#f0faf4;border-radius:12px;padding:20px;text-align:center;margin-top:16px;">
+      <div style="font-size:2rem;margin-bottom:8px;">🎉</div>
+      <h3 style="font-family:'Playfair Display',serif;color:var(--green);margin-bottom:6px;">All Corrections Complete!</h3>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px;">Great job — you now know the correct answers.</p>
+      <button class="btn btn-green" onclick="goBack()">← Back to Tests</button>
+    </div>`;
+  } else {
+    const submitArea=document.getElementById('submitArea');
+    submitArea.innerHTML=`<p style="color:var(--red);text-align:center;margin-bottom:12px;font-weight:600;">You still have ${stillWrong.length} incorrect — review and try again.</p>
+    <button class="btn btn-gold" onclick="correctMistakes()" style="width:100%;padding:16px;font-size:1.05rem;">🔄 Try Again</button>`;
+  }
 }
 
 function retryTest(){beginTest(currentTest);}
