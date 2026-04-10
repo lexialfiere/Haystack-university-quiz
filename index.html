@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Silo — Staff Training Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#0f1f2e;--navy2:#162636;--gold:#c9973a;--gold2:#e8b95a;--cream:#fdf8f0;--offwhite:#f5f0e8;--red:#c0392b;--green:#1e7a4a;--muted:#7a8fa6;--border:#ddd5c4;--card:#ffffff;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:100vh;color:var(--navy);}
+.header{background:var(--navy);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;}
+.header-title{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.35rem;}
+.header-sub{color:var(--muted);font-size:0.78rem;margin-top:2px;}
+.prog-wrap{width:160px;height:5px;background:rgba(255,255,255,0.15);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--gold);border-radius:99px;transition:width 0.4s ease;width:0%;}
+.screen{display:none;padding:28px 16px;max-width:760px;margin:0 auto;}
+.screen.active{display:block;}
+.welcome-card{background:var(--navy);border-radius:18px;padding:40px 32px;text-align:center;color:var(--cream);position:relative;overflow:hidden;}
+.welcome-card::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(201,151,58,0.25) 0%,transparent 70%);border-radius:50%;}
+.silo-icon{font-size:3rem;margin-bottom:12px;}
+.welcome-card h2{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold2);margin-bottom:8px;}
+.welcome-card p{color:#a8bcd0;font-size:0.97rem;line-height:1.65;margin-bottom:20px;}
+.badge-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:28px;}
+.badge{background:rgba(201,151,58,0.15);border:1px solid rgba(201,151,58,0.4);color:var(--gold2);border-radius:99px;padding:5px 14px;font-size:0.8rem;font-weight:600;}
+.input-group{margin-bottom:18px;text-align:left;}
+.input-group label{display:block;font-weight:600;margin-bottom:6px;color:var(--gold2);font-size:0.88rem;}
+.input-group input,.input-group select{width:100%;padding:11px 14px;border:2px solid rgba(201,151,58,0.3);border-radius:8px;background:rgba(255,255,255,0.08);color:var(--cream);font-size:0.97rem;font-family:'Source Sans 3',sans-serif;outline:none;transition:border-color 0.2s;}
+.input-group input:focus,.input-group select:focus{border-color:var(--gold);}
+.input-group input::placeholder{color:#4a6a82;}
+.input-group select option{background:var(--navy2);color:var(--cream);}
+.btn{display:inline-block;padding:13px 30px;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;border:none;transition:all 0.2s;font-family:'Source Sans 3',sans-serif;}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{background:var(--gold2);}
+.btn-outline{background:transparent;border:2px solid var(--gold);color:var(--gold);}
+.btn-outline:hover{background:rgba(201,151,58,0.1);}
+.btn-red{background:var(--red);color:#fff;}
+.btn-green{background:var(--green);color:#fff;}
+.btn-sm{padding:8px 18px;font-size:0.88rem;}
+.test-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:24px;}
+.test-card{background:var(--card);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;border:2px solid var(--border);transition:all 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.test-card:hover{border-color:var(--gold);box-shadow:0 4px 16px rgba(201,151,58,0.2);transform:translateY(-2px);}
+.test-card .tc-icon{font-size:2.2rem;margin-bottom:10px;}
+.test-card h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);margin-bottom:6px;}
+.test-card p{color:var(--muted);font-size:0.82rem;}
+.test-card.completed{border-color:var(--green);background:#f0faf4;cursor:default;}
+.test-card.completed h3{color:var(--green);}
+.q-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
+.q-count{font-size:0.85rem;color:var(--muted);font-weight:600;}
+.question-card{background:var(--card);border-radius:var(--radius);padding:26px 22px;margin-bottom:18px;box-shadow:0 2px 10px rgba(0,0,0,0.07);border:2px solid transparent;transition:border-color 0.3s;}
+.q-num{font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.q-text{font-size:1.02rem;font-weight:600;line-height:1.55;margin-bottom:16px;color:var(--navy);}
+.options{display:flex;flex-direction:column;gap:9px;}
+.option{padding:11px 15px;border-radius:8px;border:2px solid var(--border);cursor:pointer;font-size:0.93rem;transition:all 0.15s;background:#fff;text-align:left;font-family:'Source Sans 3',sans-serif;width:100%;}
+.option:hover:not([disabled]){border-color:var(--gold);background:#fffbf2;}
+.option.selected{border-color:var(--gold);background:#fffbf2;font-weight:600;}
+.option.correct-ans{border-color:var(--green)!important;background:#f0faf4!important;color:var(--green)!important;font-weight:600;}
+.option.wrong-ans{border-color:var(--red)!important;background:#fdf2f2!important;color:var(--red)!important;}
+.feedback{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:0.87rem;line-height:1.5;display:none;}
+.fb-correct{background:#f0faf4;color:var(--green);}
+.fb-wrong{background:#fdf2f2;color:var(--red);}
+.result-banner{border-radius:var(--radius);padding:32px;text-align:center;margin-bottom:24px;}
+.result-banner.pass{background:linear-gradient(135deg,#1e7a4a,#27ae60);}
+.result-banner.fail{background:linear-gradient(135deg,#7b1a0e,#c0392b);}
+.result-banner h2{font-family:'Playfair Display',serif;font-size:1.8rem;color:#fff;margin-bottom:6px;}
+.score-big{font-size:3.5rem;font-weight:800;color:#fff;line-height:1.1;}
+.result-banner p{color:rgba(255,255,255,0.85);margin-top:8px;}
+.review-item{background:var(--card);border-radius:10px;padding:16px 18px;margin-bottom:10px;border-left:4px solid var(--red);box-shadow:0 1px 6px rgba(0,0,0,0.06);}
+.review-item.ok{border-left-color:var(--green);}
+.review-q{font-weight:600;font-size:0.93rem;margin-bottom:5px;}
+.review-your{font-size:0.83rem;color:var(--red);margin-bottom:3px;}
+.review-correct{font-size:0.83rem;color:var(--green);font-weight:600;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:6px;}
+.section-sub{color:var(--muted);font-size:0.9rem;margin-bottom:24px;}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
+.pw-wrap{background:var(--navy);border-radius:var(--radius);padding:36px;text-align:center;max-width:420px;margin:0 auto;}
+.pw-wrap h2{font-family:'Playfair Display',serif;color:var(--gold2);margin-bottom:8px;}
+.pw-wrap p{color:var(--muted);margin-bottom:20px;font-size:0.9rem;}
+.manager-card{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.07);border-top:4px solid var(--gold);}
+.manager-card h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px;}
+.manager-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:0.82rem;color:var(--muted);align-items:center;}
+.tag{border-radius:99px;padding:3px 12px;font-size:0.76rem;font-weight:700;}
+.tag-pass{background:#e8f8ef;color:var(--green);}
+.tag-fail{background:#fdecea;color:var(--red);}
+.answer-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+.answer-table th{text-align:left;padding:7px 8px;background:var(--offwhite);color:var(--muted);font-weight:700;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.5px;}
+.answer-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:top;}
+.answer-table tr:last-child td{border-bottom:none;}
+.cell-correct{color:var(--green);font-weight:600;}
+.cell-wrong{color:var(--red);}
+.empty-state{text-align:center;padding:40px;color:var(--muted);}
+.all-done-card{background:var(--navy);border-radius:18px;padding:40px 32px;text-align:center;color:var(--cream);}
+.all-done-card h2{font-family:'Playfair Display',serif;color:var(--gold2);font-size:1.8rem;margin-bottom:10px;}
+.all-done-card p{color:#a8bcd0;line-height:1.6;}
+@media(max-width:520px){.welcome-card{padding:28px 20px;}.welcome-card h2{font-size:1.6rem;}.test-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">🌾 The Silo</div>
+    <div class="header-sub" id="headerSub">Staff Training Quiz</div>
+  </div>
+  <div style="text-align:right">
+    <div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
+    <div style="color:var(--muted);font-size:0.72rem;margin-top:3px;" id="progLabel"></div>
+  </div>
+</div>
+
+<!-- WELCOME -->
+<div class="screen active" id="screenWelcome">
+  <div class="welcome-card">
+    <div class="silo-icon">🏭</div>
+    <h2>Welcome to The Silo</h2>
+    <p>Complete your staff training quiz before your first shift.<br/>You need <strong style="color:var(--gold2)">85%</strong> or higher to pass each test.</p>
+    <div class="badge-row">
+      <span class="badge">📋 3 Tests</span>
+      <span class="badge">✅ 85% to Pass</span>
+      <span class="badge">🔄 Retry Until You Pass</span>
+    </div>
+    <div class="input-group">
+      <label>Your Full Name</label>
+      <input type="text" id="empName" placeholder="First and Last Name"/>
+    </div>
+    <div class="input-group">
+      <label>Your Position</label>
+      <select id="empPosition">
+        <option value="">Select your position...</option>
+        <option value="kitchen">Kitchen</option>
+        <option value="register">Register</option>
+        <option value="caboose">Ice Cream / Caboose</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>Desired Hourly Wage ($)</label>
+      <input type="number" id="empWage" placeholder="e.g. 17.50" step="0.25" min="0"/>
+    </div>
+    <div id="welcomeError" style="color:#e07060;margin-bottom:12px;font-size:0.88rem;"></div>
+    <button class="btn btn-gold" onclick="startQuiz()">Begin Training ➜</button>
+  </div>
+</div>
+
+<!-- TEST SELECT -->
+<div class="screen" id="screenSelect">
+  <div style="margin-bottom:6px;color:var(--muted);font-size:0.88rem;" id="greetingLine"></div>
+  <h2 class="section-title">Your Training Test</h2>
+  <p class="section-sub">Complete your test and score 85% or higher to pass.</p>
+  <div class="test-grid" id="testGrid"></div>
+  <div id="allDoneSection" style="display:none;margin-top:24px;">
+    <div class="all-done-card">
+      <div style="font-size:2.5rem;margin-bottom:12px;">🎉</div>
+      <h2>Training Complete!</h2>
+      <p style="margin-top:8px;">Great work! Your results have been saved and a manager will review your scores.</p>
+    </div>
+  </div>
+  <hr class="divider"/>
+  <button class="btn btn-outline btn-sm" onclick="showManager()">🔐 Manager View</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screenQuiz">
+  <div class="q-header">
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);" id="quizTitle"></div>
+      <div class="q-count" id="quizSubtitle"></div>
+    </div>
+  </div>
+  <div id="questionsContainer"></div>
+  <div style="text-align:center;margin-top:24px;" id="submitRow">
+    <button class="btn btn-gold" id="submitBtn" onclick="submitQuiz()">Submit Answers ➜</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screenResults">
+  <div id="resultBanner"></div>
+  <div id="reviewSection"></div>
+  <div style="text-align:center;margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;" id="resultActions"></div>
+</div>
+
+<!-- MANAGER -->
+<div class="screen" id="screenManager">
+  <div id="pwWrap" class="pw-wrap">
+    <h2>🔐 Manager Access</h2>
+    <p>Enter your password to view all employee results.</p>
+    <div class="input-group" style="max-width:300px;margin:0 auto 16px;">
+      <input type="password" id="managerPw" placeholder="Password" style="color:var(--cream);"/>
+    </div>
+    <button class="btn btn-gold" onclick="checkPw()">Enter</button>
+    <div style="margin-top:12px;"><button class="btn btn-outline btn-sm" onclick="showScreen('screenSelect')">← Back</button></div>
+    <div id="pwError" style="color:#e07060;margin-top:10px;font-size:0.88rem;"></div>
+  </div>
+  <div id="managerContent" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div><h2 class="section-title">Employee Results</h2><p class="section-sub" style="margin-bottom:0">All submitted quiz results</p></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-red btn-sm" onclick="clearResults()">🗑 Clear All</button>
+        <button class="btn btn-outline btn-sm" onclick="showScreen('screenSelect')">← Back</button>
+      </div>
+    </div>
+    <div id="managerResults"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// QUESTION BANK
+// ═══════════════════════════════════════════════
+
+const GENERAL = [
+  {q:"What was the Silo originally used for?",type:"mc",options:["A grain storage facility","A coal silo — steamships pulled up to load their ships","A water tower","A lumber yard"],answer:"A coal silo — steamships pulled up to load their ships"},
+  {q:"What year did the Silo open as a restaurant?",type:"mc",options:["1985","1992","1998","2003"],answer:"1998"},
+  {q:"What is the Silo best known for in the community?",type:"mc",options:["Fine dining and wine","Quick service, Haystacks, friendly staff, and clean dining","All-you-can-eat buffets","Late-night food only"],answer:"Quick service, Haystacks, friendly staff, and clean dining"},
+  {q:"What is a Haystack?",type:"mc",options:["Pulled pork on a brioche bun with coleslaw","A chicken sandwich with waffle fries on top","Steak and mozzarella cheese in a hoagie roll with crunchy hash browns on top and a little mayo in the roll","A burger with fried onion strings and special sauce"],answer:"Steak and mozzarella cheese in a hoagie roll with crunchy hash browns on top and a little mayo in the roll"},
+  {q:"The Haystack was featured on what TV show?",type:"mc",options:["Diners, Drive-Ins and Dives","Man vs. Food","Kitchen Nightmares","Chopped"],answer:"Man vs. Food"},
+  {q:"Why is being precise with everything — fully scraping cans empty, using the right amount of cheese on a Haystack — imperative to the business?",type:"mc",options:["It makes the food look better","Health code requires exact portions","It keeps food cost in check so we are able to pay our employees better wages","Customers notice the difference immediately"],answer:"It keeps food cost in check so we are able to pay our employees better wages"},
+  {q:"What must be at every work station?",type:"mc",options:["A hand sanitizer dispenser","A fire extinguisher","A bleach bucket with half cap bleach and warm water with its own rag","A spray bottle of all-purpose cleaner"],answer:"A bleach bucket with half cap bleach and warm water with its own rag"},
+  {q:"What is an appropriate hairstyle for work?",type:"mc",options:["Ponytail","Loose bun with flyaways","Tight bun — no flyaways, no ponytails","Hair down is fine if it's clean"],answer:"Tight bun — no flyaways, no ponytails"},
+  {q:"What should you do when passing a customer?",type:"mc",options:["Keep walking and stay focused on your task","Greet them — if they're eating, ask how everything is. Never ignore a customer","Nod your head","Only greet them if they speak to you first"],answer:"Greet them — if they're eating, ask how everything is. Never ignore a customer"},
+  {q:"When can you use your phone?",type:"mc",options:["Anytime as long as you're not busy","Only on break — never on the cook line or in front of customers","Only before your shift starts","Texting is fine, just no calls"],answer:"Only on break — never on the cook line or in front of customers"},
+  {q:"Where can you take your break? Is vaping or smoking on the property allowed?",type:"mc",options:["Anywhere outside is fine, vaping is okay if discreet","Breaks at outside tables only — smoking and vaping anywhere on property is NOT permitted. You will be written up","You can smoke by the dumpsters","Vaping is allowed as long as customers can't see you"],answer:"Breaks at outside tables only — smoking and vaping anywhere on property is NOT permitted. You will be written up"},
+  {q:"Can you leave the property while on the clock?",type:"mc",options:["Yes, if your break is long enough","Yes, for a quick errand","No — you may not leave the premises while on the clock","Only with manager permission"],answer:"No — you may not leave the premises while on the clock"},
+  {q:"What can be set on the ground?",type:"mc",options:["Boxes are okay since they're sealed","Anything temporarily while unloading","Nothing — everything must be on a shelf, including boxes","Only dry goods"],answer:"Nothing — everything must be on a shelf, including boxes"},
+  {q:"How long should closing take, and when must everyone be off the clock?",type:"mc",options:["1 hour — off the clock 90 minutes after close","30 minutes — off the clock 45 minutes after close","40 minutes — everyone must be off the clock within an hour of the restaurant closing","2 hours depending on how busy the day was"],answer:"40 minutes — everyone must be off the clock within an hour of the restaurant closing"},
+  {q:"A customer walks by and you're in the middle of a task. What do you do?",type:"mc",options:["Finish your task first, then greet them","Ignore them — they'll ask if they need something","Stop and greet them — ignoring a customer is never acceptable","Only greet them if they make eye contact"],answer:"Stop and greet them — ignoring a customer is never acceptable"},
+  {q:"You notice a coworker left a box on the floor. What should you do?",type:"mc",options:["Leave it — it's not your responsibility","Kick it to the side so it's out of the way","Put it on a shelf — nothing is ever left on the ground","Tell a manager and wait for them to handle it"],answer:"Put it on a shelf — nothing is ever left on the ground"},
+  {q:"How do you stock ANYTHING — beer, custard, bread bags, kitchen items?",type:"mc",options:["Newest to the front so it's easiest to grab","It doesn't matter as long as it's stocked","Oldest to the front, newest to the back","Alphabetically by product name"],answer:"Oldest to the front, newest to the back"},
+  {q:"Why is rotation stocking (oldest to front) important?",type:"mc",options:["It looks more organized for inspections","It prevents waste and spoilage — older product gets used first before it expires","It's only important for dairy products","Customers prefer fresher products at the back"],answer:"It prevents waste and spoilage — older product gets used first before it expires"},
+  {q:"A new delivery arrives. Where does the new stock go?",type:"mc",options:["Wherever there's space","In the front for easy access","Behind the old stock — always oldest to the front","It depends on the product type"],answer:"Behind the old stock — always oldest to the front"},
+  {q:"What should you do if you notice something is running low during your shift?",type:"mc",options:["Wait until it runs out and then tell someone","Tell a manager immediately — don't wait until it's gone","Write it on the notepad and mention it at end of shift","Assume the next shift will handle it"],answer:"Tell a manager immediately — don't wait until it's gone"},
+  {q:"What is the correct way to handle a customer complaint?",type:"mc",options:["Explain why it wasn't your fault","Tell them to speak to a manager and walk away","Listen, apologize, get a manager — never argue or dismiss them","Offer a discount immediately to resolve it"],answer:"Listen, apologize, get a manager — never argue or dismiss them"},
+  {q:"Are no call no shows acceptable?",type:"mc",options:["Yes, if it's a genuine emergency","Yes, if you text a coworker","No — you must find a cover or you will be written up with possible termination","Only if it's your first offense"],answer:"No — you must find a cover or you will be written up with possible termination"},
+  {q:"You can't make your shift. What is the correct thing to do?",type:"mc",options:["Call out 30 minutes before your shift","Just text your manager and hope for the best","Find a cover and notify a manager — never just not show up","Post in the group chat and hope someone picks it up"],answer:"Find a cover and notify a manager — never just not show up"},
+  {q:"Under NYS law, how long is a required meal break and when must it be given?",type:"mc",options:["15 minutes after 4 hours of work","30-minute unpaid meal break for shifts over 6 consecutive hours","45 minutes at the halfway point of any shift","20 minutes after 5 hours of work"],answer:"30-minute unpaid meal break for shifts over 6 consecutive hours"},
+  {q:"What should you do if you are approaching 40 hours in a work week?",type:"mc",options:["Keep picking up shifts — overtime is always approved","Do not pick up more shifts until you check with a manager about overtime availability that week","Stop working immediately at 40 hours without telling anyone","Overtime is fine as long as you need the money"],answer:"Do not pick up more shifts until you check with a manager about overtime availability that week"},
+  {q:"Work/home life balance is important. What is one way to prioritize your mental health?",type:"mc",options:["Pick up as many shifts as possible to stay busy","Don't pick up shifts on your day off — do something you enjoy, go for a walk, drink water","Sleep as much as possible on your days off","Avoid socializing after work"],answer:"Don't pick up shifts on your day off — do something you enjoy, go for a walk, drink water"},
+  {q:"What must you do before you leave every shift — regardless of opening or closing?",type:"mc",options:["Clock out and let the next shift figure it out","Just clean your personal station","Stock, clean, and change garbage. Bring up low ice cream, cheese, beer, etc. Everything must be reset, refilled, and cleaned for the next shift","Only closing staff needs to restock"],answer:"Stock, clean, and change garbage. Bring up low ice cream, cheese, beer, etc. Everything must be reset, refilled, and cleaned for the next shift"},
+  {q:"What is a big part of closing?",type:"mc",options:["Counting the register and going home","Restocking — all food, all coolers, low ice cream, all paper products. Floors and counters must be spotless, even under equipment","Locking up and turning off lights","Writing the next day's schedule"],answer:"Restocking — all food, all coolers, low ice cream, all paper products. Floors and counters must be spotless, even under equipment"},
+  {q:"Why is it important to restock before you leave even if you're not the closing shift?",type:"mc",options:["It's not important — only closers need to worry about it","So the next shift is never scrambling — a well-stocked station sets the whole team up for success","It's only required during busy season","Managers will restock after you leave"],answer:"So the next shift is never scrambling — a well-stocked station sets the whole team up for success"},
+  {q:"What must be at every sink, including bathrooms, per NYS law?",type:"mc",options:["Hand sanitizer and a towel rack","Soap, paper towels, and hot water","Soap and cold water","A sanitizer dispenser and gloves"],answer:"Soap, paper towels, and hot water"}
+];
+
+const KITCHEN_ONLY = [
+  {q:"What is the correct minimum internal temperature for chicken?",type:"mc",options:["145°F","155°F","165°F","175°F"],answer:"165°F"},
+  {q:"What is the minimum safe internal temperature for ground beef?",type:"mc",options:["145°F","155°F","160°F","170°F"],answer:"160°F"},
+  {q:"What is the minimum safe internal temperature for pork?",type:"mc",options:["135°F","145°F","155°F","165°F"],answer:"145°F"},
+  {q:"If you're wearing gloves and touch raw meat, what must you do before touching cheese or produce?",type:"mc",options:["Rinse gloves under water","It's fine as long as you wipe your hands","Change gloves — also change whenever gloves are soiled or contaminated","Only change if you touched chicken"],answer:"Change gloves — also change whenever gloves are soiled or contaminated"},
+  {q:"Your gloves get wet and dirty mid-task. What do you do?",type:"mc",options:["Keep going — gloves protect the food","Rinse them off and continue","Change them immediately — soiled or contaminated gloves must always be replaced","Take gloves off and use bare hands"],answer:"Change them immediately — soiled or contaminated gloves must always be replaced"},
+  {q:"What is the correct order for the refrigerator?",type:"mc",options:["Everything together, organized by date","Produce on top, then dairy, then meat at the bottom","Cheese on top, then items organized by cook time, with chicken alone on the very bottom","Heaviest items on the bottom regardless of type"],answer:"Cheese on top, then items organized by cook time, with chicken alone on the very bottom"},
+  {q:"What is the proper thawing method?",type:"mc",options:["Leave it out on the prep table at room temperature","Microwave it until partially thawed","Run under cold water OR place in fridge early — never leave out in the basement","Leave it in a warm water bath"],answer:"Run under cold water OR place in fridge early — never leave out in the basement"},
+  {q:"A pan of chicken was left on the prep table to thaw overnight. Is this correct?",type:"mc",options:["Yes, as long as it's covered","Yes, the basement is cool enough","No — must be thawed under cold running water or in the fridge","Only acceptable if it was frozen solid"],answer:"No — must be thawed under cold running water or in the fridge"},
+  {q:"What are three things you must do when arriving to your shift?",type:"mc",options:["Check the schedule, eat a snack, review the menu","Put away personal items, put on hair net, wash hands","Clock in, check emails, review orders","Wash hands, check your phone, put on apron"],answer:"Put away personal items, put on hair net, wash hands"},
+  {q:"What is the proper way to clean the grill and flat top?",type:"mc",options:["Spray with all-purpose cleaner and wipe down","Manual scrubbing with water — no chemicals; charcoal brick on the flat top, scraping and scrubbing on the grill","Use a degreaser and rinse with water","Soap and water with a sponge"],answer:"Manual scrubbing with water — no chemicals; charcoal brick on the flat top, scraping and scrubbing on the grill"},
+  {q:"How should bread pull work?",type:"mc",options:["Pull everything first thing in the morning regardless of weather","Pull only what you need mid-shift","Pull the appropriate amount in the morning based on weather — lower numbers on bad weather days","Let the closing shift handle bread pull"],answer:"Pull the appropriate amount in the morning based on weather — lower numbers on bad weather days"},
+  {q:"What is the temperature danger zone for food?",type:"mc",options:["50°F–130°F","40°F–140°F","35°F–150°F","45°F–160°F"],answer:"40°F–140°F"},
+  {q:"How long can food safely sit in the temperature danger zone?",type:"mc",options:["Up to 4 hours","Up to 30 minutes","No more than 2 hours total","As long as it looks and smells fine"],answer:"No more than 2 hours total"},
+  {q:"What does cross-contamination mean?",type:"mc",options:["Using the wrong size pan for a recipe","When bacteria from one food — especially raw meat — spreads to another food or surface","Mixing two sauces together by mistake","Using an expired ingredient"],answer:"When bacteria from one food — especially raw meat — spreads to another food or surface"},
+  {q:"How do you prevent cross-contamination?",type:"mc",options:["Keep everything in the same cooler to save space","Separate raw meats from produce and cheese, change gloves, use clean surfaces and utensils","Wash everything with hot water after prep","Only use gloves when handling raw chicken"],answer:"Separate raw meats from produce and cheese, change gloves, use clean surfaces and utensils"},
+  {q:"Under NYS food safety law, what must you do before handling food after using the restroom?",type:"mc",options:["Use hand sanitizer","Wash hands thoroughly with soap and warm water for at least 20 seconds","Put on gloves immediately","Rinse hands quickly under cold water"],answer:"Wash hands thoroughly with soap and warm water for at least 20 seconds"},
+  {q:"What should you do with produce that looks like it's turning?",type:"mc",options:["Use it immediately before it gets worse","Cut off the bad part and use the rest","Tell a manager immediately — don't throw it away without telling someone first, as we can get supplier credits. Always text Lexi","Throw it away so it doesn't contaminate other food"],answer:"Tell a manager immediately — don't throw it away without telling someone first, as we can get supplier credits. Always text Lexi"},
+  {q:"You prepped too much of an item and it needs to be stored. What must you do?",type:"mc",options:["Leave it on the counter until the rush starts","Label it with the date and store properly — oldest to the front","Put it in the walk-in without labeling","Throw it away since it won't be used"],answer:"Label it with the date and store properly — oldest to the front"},
+  {q:"What does food cost mean and why does it matter?",type:"mc",options:["The cost of kitchen equipment — it affects the renovation budget","The cost of ingredients used — wasting food directly reduces the restaurant's profit and employees' wages","Only matters for expensive items like steak","It's the manager's concern, not line staff"],answer:"The cost of ingredients used — wasting food directly reduces the restaurant's profit and employees' wages"},
+  {q:"All squirt bottles in the kitchen must be what?",type:"mc",options:["Color coded by use","Kept in the walk-in when not in use","Labeled — even water bottles must be clearly labeled","Replaced weekly regardless of contents"],answer:"Labeled — even water bottles must be clearly labeled"},
+  {q:"All coolers must be kept below what temperature?",type:"mc",options:["45°F","41°F","40°F","38°F"],answer:"40°F"},
+  {q:"If you notice you're over-prepping and making more food than needed, what should you do?",type:"mc",options:["Keep going — more is always better","Tell a manager — over-prepping leads to food waste and lost profit","Slow down but don't say anything","Prep extra and freeze it"],answer:"Tell a manager — over-prepping leads to food waste and lost profit"}
+];
+
+const REGISTER_ONLY = [
+  {q:"What should you say when a customer walks in?",type:"mc",options:["'What can I get you?'","'Go ahead when you're ready'","'Hi, welcome to the Silo, how can I help you?'","'Be right with you!'"],answer:"'Hi, welcome to the Silo, how can I help you?'"},
+  {q:"What are your two main focuses at the register?",type:"mc",options:["Speed and accuracy on the register only","Clean tables and short lines — take care of customers immediately, then sweep deck, clean condiment stations, change garbage","Upselling and smiling","Keeping the register drawer organized and accurate"],answer:"Clean tables and short lines — take care of customers immediately, then sweep deck, clean condiment stations, change garbage"},
+  {q:"A line is forming and you're cleaning a table. What do you do?",type:"mc",options:["Finish cleaning the table so it's done","Ask a coworker to cover the register","Walk quickly to the register — short lines are a top priority","Keep cleaning and tell customers you'll be right there"],answer:"Walk quickly to the register — short lines are a top priority"},
+  {q:"Why is it important to minimize customer wait time?",type:"mc",options:["Managers will write you up for slow service","Long lines hurt customer experience and can cost the business sales","Customers get a discount if they wait too long","It affects your personal tip amount only"],answer:"Long lines hurt customer experience and can cost the business sales"},
+  {q:"A customer seems unhappy with their order. What should you do?",type:"mc",options:["Explain what went wrong and why","Tell them all orders are final","Apologize, get a manager, and make it right — never argue or dismiss them","Offer them a free item without asking a manager"],answer:"Apologize, get a manager, and make it right — never argue or dismiss them"},
+  {q:"How can you upsell every order?",type:"mc",options:["Suggest the most expensive item on the menu","Ask if they want extra napkins and condiments","Ask if they'd like to make it a meal with fries and a drink","Tell them about daily specials only"],answer:"Ask if they'd like to make it a meal with fries and a drink"},
+  {q:"Why is upselling important?",type:"mc",options:["It makes your shift go faster","It increases the check average and revenue for the business","It's required by law","Only managers need to upsell"],answer:"It increases the check average and revenue for the business"},
+  {q:"What do you say after someone buys a milkshake?",type:"mc",options:["'It'll be right out for you!'","'Your milkshake will be made at our ice cream caboose — please go right over there, your buzzer will ring and they will call it out the window, you do not need to wait in line'","'Someone will bring it to your table'","'Go wait by the pickup window'"],answer:"'Your milkshake will be made at our ice cream caboose — please go right over there, your buzzer will ring and they will call it out the window, you do not need to wait in line'"},
+  {q:"Why is it important to explain the milkshake process to the customer?",type:"mc",options:["So they leave a better tip","So they don't get frustrated thinking they have to wait in a second line","It's a health code requirement","So they know it's freshly made"],answer:"So they don't get frustrated thinking they have to wait in a second line"},
+  {q:"A customer looks confused after ordering a milkshake and starts walking toward the exit. What do you do?",type:"mc",options:["Let them go — they'll figure it out","Call out to them and proactively explain the caboose process before they leave","Page a manager","Tell the next customer in line"],answer:"Call out to them and proactively explain the caboose process before they leave"},
+  {q:"A customer asks for a refund. What do you do?",type:"mc",options:["Process it immediately to avoid a scene","Tell them no refunds","Get a manager — never process a refund or make a promise without manager approval","Offer store credit instead"],answer:"Get a manager — never process a refund or make a promise without manager approval"},
+  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not register staff"],answer:"As the very last step — the person counting them must be off the clock"},
+  {q:"Why must the tip counter be off the clock when counting tips?",type:"mc",options:["It's just a preference","To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues","So they can leave faster","Tips aren't part of official payroll"],answer:"To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues"}
+];
+
+const CABOOSE_ONLY = [
+  {q:"Why should scoops be the same size as the person you're working with?",type:"mc",options:["To avoid running out of custard too quickly","So the line moves faster","To keep a consistent customer experience","Because the health department requires it"],answer:"To keep a consistent customer experience"},
+  {q:"What happens if scoops are inconsistently sized between staff members?",type:"mc",options:["Nothing — customers don't notice","Customers get different amounts, leading to complaints and food cost issues","Only matters for specialty flavors","It affects freezer storage only"],answer:"Customers get different amounts, leading to complaints and food cost issues"},
+  {q:"Why does portion control matter in ice cream service?",type:"mc",options:["It makes cones look prettier","Overscooping increases food cost and waste — every scoop affects profitability and employee wages","Customers always want less","The machine breaks if overfilled"],answer:"Overscooping increases food cost and waste — every scoop affects profitability and employee wages"},
+  {q:"A customer says their cone looks smaller than last time. How do you respond?",type:"mc",options:["Tell them portions are set by management","Argue that it's the correct size","Give them extra without asking anyone","Apologize and get a manager — never argue; consistency is the goal"],answer:"Apologize and get a manager — never argue; consistency is the goal"},
+  {q:"How do you thaw custard?",type:"mc",options:["Leave it out on the counter for a few hours","Microwave it in short bursts","Put it in the fridge early whenever there are open spots","Run it under warm water"],answer:"Put it in the fridge early whenever there are open spots"},
+  {q:"What should you do if the custard machine is running low?",type:"mc",options:["Wait until it's completely empty before refilling","Tell a customer the flavor is sold out","Fill the machine with fully thawed custard","Turn the machine off until more thaws"],answer:"Fill the machine with fully thawed custard"},
+  {q:"What are appropriate things to say to a customer at the caboose?",type:"mc",options:["'What do you want?' and 'Next!'","'Hi! How can I help you?', 'Sorry it's so loud, what was that?', 'Okay great, anything else today?'","'Be right with you' and nothing else","'Sorry for the wait' every time regardless"],answer:"'Hi! How can I help you?', 'Sorry it's so loud, what was that?', 'Okay great, anything else today?'"},
+  {q:"What do you do if you receive a milkshake order from the inside register?",type:"mc",options:["Finish your current customer first, then make it","Make it right away, call it on the pager, and call it out LOUDLY through the window","Set it aside until there's a break in the line","Have inside staff deliver it to the customer"],answer:"Make it right away, call it on the pager, and call it out LOUDLY through the window"},
+  {q:"Why is it important to call out milkshake orders loudly at the window?",type:"mc",options:["So the kitchen knows it's been made","So the customer hears it and knows their order is ready — prevents confusion and frustration","Health code requires it","So other customers know it's available"],answer:"So the customer hears it and knows their order is ready — prevents confusion and frustration"},
+  {q:"You get slammed with orders and a custard flavor is getting low. What do you do?",type:"mc",options:["Ration smaller portions until it runs out","Stop selling that flavor without telling anyone","Alert a manager immediately — don't wait until it's fully gone","Switch customers to a different flavor without asking"],answer:"Alert a manager immediately — don't wait until it's fully gone"},
+  {q:"What is the impact of running out of a custard flavor mid-rush?",type:"mc",options:["It's fine — customers understand","It disappoints customers, loses sales, and hurts the overall experience","Only affects revenue slightly","It's unavoidable and not worth worrying about"],answer:"It disappoints customers, loses sales, and hurts the overall experience"},
+  {q:"Why is it important to keep your station clean during a rush?",type:"mc",options:["Only clean during slow periods","Food safety, customer perception, and health code compliance — a dirty station reflects on the whole business","Cleaning during a rush slows you down too much","Only the closing crew needs to worry about cleanliness"],answer:"Food safety, customer perception, and health code compliance — a dirty station reflects on the whole business"},
+  {q:"Under NYS food safety rules, what temperature must dairy-based products like custard be kept at?",type:"mc",options:["Below 45°F","Below 41°F","Below 40°F","Below 38°F"],answer:"Below 40°F"},
+  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not caboose staff"],answer:"As the very last step — the person counting them must be off the clock"},
+  {q:"Why must the tip counter be off the clock when counting tips?",type:"mc",options:["It's just a preference","To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues","So they can leave faster","Tips aren't part of official payroll"],answer:"To ensure accurate wage reporting and compliance with NYS labor law — counting tips on the clock creates payroll issues"}
+];
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let empName='', empPosition='', empWage='';
+let currentTest=null, currentQuestions=[], userAnswers={};
+let results=JSON.parse(localStorage.getItem('siloResults')||'[]');
+
+const TESTS={
+  kitchen:{label:'Kitchen',icon:'🍳'},
+  register:{label:'Register',icon:'💵'},
+  caboose:{label:'Ice Cream / Caboose',icon:'🍦'}
+};
+
+function getQuestionsFor(pos){
+  const specific=pos==='kitchen'?KITCHEN_ONLY:pos==='register'?REGISTER_ONLY:CABOOSE_ONLY;
+  return [...GENERAL,...specific];
+}
+
+// ═══════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function setProgress(pct,lbl){
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLabel').textContent=lbl||'';
+}
+
+// ═══════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════
+function startQuiz(){
+  const name=document.getElementById('empName').value.trim();
+  const pos=document.getElementById('empPosition').value;
+  const wage=document.getElementById('empWage').value.trim();
+  const err=document.getElementById('welcomeError');
+  if(!name){err.textContent='Please enter your full name.';return;}
+  if(!pos){err.textContent='Please select your position.';return;}
+  if(!wage){err.textContent='Please enter your desired wage.';return;}
+  err.textContent='';
+  empName=name; empPosition=pos; empWage=wage;
+  document.getElementById('greetingLine').textContent='Logged in as: '+empName+' — '+TESTS[pos].label;
+  buildTestGrid();
+  showScreen('screenSelect');
+  setProgress(0,'');
+}
+
+function buildTestGrid(){
+  const grid=document.getElementById('testGrid');
+  grid.innerHTML='';
+  const passed=results.filter(r=>r.name===empName&&r.position===empPosition&&r.passed&&r.test===empPosition);
+  const hasPassed=passed.length>0;
+  const card=document.createElement('div');
+  card.className='test-card'+(hasPassed?' completed':'');
+  card.innerHTML=`<div class="tc-icon">${TESTS[empPosition].icon}</div>
+    <h3>${TESTS[empPosition].label} Test</h3>
+    <p>${hasPassed?'✅ Passed':getQuestionsFor(empPosition).length+' questions — tap to begin'}</p>`;
+  if(!hasPassed) card.onclick=()=>beginTest(empPosition);
+  grid.appendChild(card);
+  document.getElementById('allDoneSection').style.display=hasPassed?'block':'none';
+}
+
+// ═══════════════════════════════════════════════
+// TEST
+// ═══════════════════════════════════════════════
+function beginTest(pos){
+  currentTest=pos;
+  currentQuestions=getQuestionsFor(pos);
+  userAnswers={};
+  document.getElementById('quizTitle').textContent=TESTS[pos].icon+' '+TESTS[pos].label+' Test';
+  document.getElementById('quizSubtitle').textContent=currentQuestions.length+' questions — score 85% or higher to pass';
+  renderQuestions();
+  showScreen('screenQuiz');
+  setProgress(10,'In progress...');
+}
+
+function renderQuestions(){
+  const container=document.getElementById('questionsContainer');
+  container.innerHTML='';
+  currentQuestions.forEach((q,i)=>{
+    const card=document.createElement('div');
+    card.className='question-card';
+    card.id='qcard-'+i;
+    let inner=`<div class="q-num">Question ${i+1} of ${currentQuestions.length}</div>
+               <div class="q-text">${q.q}</div>`;
+    inner+=`<div class="options">`+q.options.map((opt,oi)=>
+      `<button class="option" id="opt-${i}-${oi}" onclick="selectOption(${i},${oi},this)">${opt}</button>`
+    ).join('')+`</div>`;
+    inner+=`<div class="feedback" id="fb-${i}"></div>`;
+    card.innerHTML=inner;
+    container.appendChild(card);
+  });
+  document.getElementById('submitRow').style.display='block';
+}
+
+function selectOption(qi,oi,el){
+  userAnswers[qi]=el.textContent;
+  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ═══════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════
+function submitQuiz(){
+  const unanswered=[];
+  currentQuestions.forEach((_,i)=>{if(!userAnswers[i])unanswered.push(i+1);});
+  if(unanswered.length>0){alert('Please answer all questions before submitting.\nUnanswered: Q'+unanswered.join(', Q'));return;}
+  let correct=0;
+  const details=[];
+  currentQuestions.forEach((q,i)=>{
+    const given=(userAnswers[i]||'').trim();
+    const isCorrect=given===q.answer;
+    if(isCorrect)correct++;
+    details.push({question:q.q,given,correct:q.answer,isCorrect});
+  });
+  const pct=Math.round((correct/currentQuestions.length)*100);
+  const passed=pct>=85;
+  const entry={name:empName,position:empPosition,wage:empWage,test:currentTest,score:pct,correct,total:currentQuestions.length,passed,details,timestamp:new Date().toLocaleString()};
+  results.push(entry);
+  localStorage.setItem('siloResults',JSON.stringify(results));
+  showResults(entry);
+}
+
+// ═══════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════
+function showResults(entry){
+  showScreen('screenResults');
+  setProgress(entry.passed?100:50,entry.passed?'Passed ✅':'Needs retry');
+  const banner=document.getElementById('resultBanner');
+  banner.className='result-banner '+(entry.passed?'pass':'fail');
+  banner.innerHTML=`<h2>${entry.passed?'🎉 You Passed!':'❌ Not Quite'}</h2>
+    <div class="score-big">${entry.score}%</div>
+    <p>${entry.correct} of ${entry.total} correct${entry.passed?' — Great work, '+empName+'!':' — Review the answers below, then retry.'}</p>`;
+  const review=document.getElementById('reviewSection');
+  const wrong=entry.details.filter(d=>!d.isCorrect);
+  const right=entry.details.filter(d=>d.isCorrect);
+  let html='';
+  if(!entry.passed&&wrong.length>0){
+    html+=`<h3 style="font-family:'Playfair Display',serif;margin:0 0 14px;color:var(--red);">❌ Incorrect — Study These (${wrong.length})</h3>`;
+    wrong.forEach(d=>{html+=`<div class="review-item"><div class="review-q">${d.question}</div><div class="review-your">Your answer: ${d.given||'(none)'}</div><div class="review-correct">✅ Correct: ${d.correct}</div></div>`;});
+    html+=`<hr class="divider"/>`;
+  }
+  html+=`<h3 style="font-family:'Playfair Display',serif;margin:0 0 14px;color:var(--green);">✅ Correct (${right.length})</h3>`;
+  right.forEach(d=>{html+=`<div class="review-item ok"><div class="review-q">${d.question}</div><div class="review-correct">✅ ${d.correct}</div></div>`;});
+  review.innerHTML=html;
+  const actions=document.getElementById('resultActions');
+  actions.innerHTML=entry.passed
+    ?`<button class="btn btn-green" onclick="goBack()">← Back to Tests</button>`
+    :`<button class="btn btn-gold" onclick="retryTest()">🔄 Retry Test</button><button class="btn btn-outline" onclick="goBack()">← Back</button>`;
+}
+
+function retryTest(){beginTest(currentTest);}
+function goBack(){buildTestGrid();showScreen('screenSelect');setProgress(0,'');}
+
+// ═══════════════════════════════════════════════
+// MANAGER
+// ═══════════════════════════════════════════════
+function showManager(){
+  document.getElementById('pwWrap').style.display='block';
+  document.getElementById('managerContent').style.display='none';
+  document.getElementById('managerPw').value='';
+  document.getElementById('pwError').textContent='';
+  showScreen('screenManager');
+}
+function checkPw(){
+  if(document.getElementById('managerPw').value==='haystack1'){
+    document.getElementById('pwWrap').style.display='none';
+    document.getElementById('managerContent').style.display='block';
+    renderManagerResults();
+  } else {
+    document.getElementById('pwError').textContent='Incorrect password. Try again.';
+  }
+}
+function renderManagerResults(){
+  const container=document.getElementById('managerResults');
+  const fresh=JSON.parse(localStorage.getItem('siloResults')||'[]');
+  if(fresh.length===0){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">📋</div><p>No results submitted yet.</p></div>`;return;}
+  const byName={};
+  fresh.forEach(r=>{if(!byName[r.name])byName[r.name]=[];byName[r.name].push(r);});
+  let html='';
+  Object.keys(byName).sort().forEach(name=>{
+    const entries=byName[name];
+    const latest=entries[entries.length-1];
+    html+=`<div class="manager-card"><h3>${name}</h3>
+      <div class="manager-meta">
+        <span>📍 ${TESTS[latest.position]?.label||latest.position}</span>
+        <span>💰 Desired wage: $${latest.wage}/hr</span>
+        <span>🕐 ${latest.timestamp}</span>
+      </div>`;
+    entries.forEach(r=>{
+      html+=`<div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <strong style="font-size:0.88rem">${TESTS[r.test]?.icon||''} ${TESTS[r.test]?.label||r.test} Test</strong>
+          <span class="tag ${r.passed?'tag-pass':'tag-fail'}">${r.passed?'✅ PASSED':'❌ FAILED'} — ${r.score}%</span>
+          <span style="font-size:0.78rem;color:var(--muted)">${r.correct}/${r.total} correct</span>
+        </div>
+        <table class="answer-table"><thead><tr><th>#</th><th>Question</th><th>Their Answer</th><th>Correct Answer</th></tr></thead><tbody>`;
+      r.details.forEach((d,i)=>{
+        html+=`<tr><td>${i+1}</td><td>${d.question}</td>
+          <td class="${d.isCorrect?'cell-correct':'cell-wrong'}">${d.given||'—'}</td>
+          <td>${d.correct}</td></tr>`;
+      });
+      html+=`</tbody></table></div>`;
+    });
+    html+=`</div>`;
+  });
+  container.innerHTML=html;
+}
+function clearResults(){
+  if(confirm('Clear ALL employee results? This cannot be undone.')){
+    localStorage.removeItem('siloResults');
+    results=[];
+    renderManagerResults();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('screenManager').classList.contains('active'))checkPw();
+});
+</script>
+</body>
+</html>
