@@ -467,6 +467,19 @@ const CABOOSE_ONLY = [
 ];
 
 // ═══════════════════════════════════════════════
+// CLOUD BACKEND
+// ═══════════════════════════════════════════════
+const SHEET_URL='https://script.google.com/macros/s/AKfycbzp5IvC9C84ncOaHdv3Dpl-9PzR4xv0OlU7H4H925g_LJEVyTYFKfG_IZLI_F-N7NcI/exec';
+
+function saveToCloud(entry){
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)}).catch(()=>{});
+}
+
+function loadFromCloud(){
+  return fetch(SHEET_URL).then(r=>r.json()).catch(()=>[]);
+}
+
+// ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
 let empName='', empPosition='', empWage='';
@@ -616,6 +629,7 @@ function submitQuiz(){
   const entry={name:empName,position:empPosition,wage:empWage,test:currentTest,score:pct,correct,total:currentQuestions.length,passed,details,timestamp:new Date().toLocaleString()};
   results.push(entry);
   localStorage.setItem('siloResults',JSON.stringify(results));
+  saveToCloud(entry);
   showResults(entry);
 }
 
@@ -760,7 +774,24 @@ function checkPw(){
 }
 function renderManagerResults(){
   const container=document.getElementById('managerResults');
-  const fresh=JSON.parse(localStorage.getItem('siloResults')||'[]');
+  container.innerHTML=`<div class="empty-state"><div style="font-size:1.5rem;margin-bottom:8px">⏳</div><p>Loading results from all devices...</p></div>`;
+  loadFromCloud().then(cloud=>{
+    const local=JSON.parse(localStorage.getItem('siloResults')||'[]');
+    const seen=new Set();
+    const merged=[];
+    [...cloud,...local].forEach(r=>{
+      const key=r.name+'|'+r.test+'|'+r.timestamp;
+      if(!seen.has(key)){seen.add(key);merged.push(r);}
+    });
+    merged.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+    renderResultsTable(merged);
+  }).catch(()=>{
+    const fresh=JSON.parse(localStorage.getItem('siloResults')||'[]');
+    renderResultsTable(fresh);
+  });
+}
+function renderResultsTable(fresh){
+  const container=document.getElementById('managerResults');
   if(fresh.length===0){container.innerHTML=`<div class="empty-state"><div style="font-size:2rem;margin-bottom:8px">📋</div><p>No results submitted yet.</p></div>`;return;}
   const byName={};
   fresh.forEach(r=>{if(!byName[r.name])byName[r.name]=[];byName[r.name].push(r);});
