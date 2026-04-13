@@ -216,6 +216,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
       <li><strong>Before leaving any shift:</strong> Stock, clean, and change garbage. Bring up low ice cream, cheese, beer, etc. Reset everything for the next shift.</li>
       <li><strong>Closing:</strong> Restock all food, all coolers, low ice cream, all paper products. Floors and counters spotless — even under equipment.</li>
       <li><strong>Late customers get the same experience.</strong> We serve customers up until a few minutes past closing. A customer at 8:50pm should get the same quality and speed as one at 1:00pm. Clean the grill and equipment quickly — never slow down service because it's close to closing.</li>
+      <li><strong>Deck windows:</strong> Must be either fully up and strapped or fully down and buttoned. Never leave them halfway — the wind will make them blow up and down, ruining the windows and potentially hurting a customer.</li>
     </ul>
   </div>
 
@@ -246,6 +247,7 @@ body{font-family:'Source Sans 3',sans-serif;background:var(--cream);min-height:1
       <li><strong>Milkshake process:</strong> Always explain the caboose. They do not wait in line again.</li>
       <li><strong>Refunds:</strong> Always get a manager — never process without approval.</li>
       <li><strong>Tips:</strong> Counted as the very last step. The person counting must be off the clock.</li>
+      <li><strong>Deck windows:</strong> Must be either fully up and strapped or fully down and buttoned — never left halfway. Wind will make them flap, which ruins the windows and can hurt a customer.</li>
     </ul>
   </div>
 
@@ -402,7 +404,8 @@ const GENERAL = [
   {q:"What do you do when there are no current orders or customers?",type:"mc",options:["Stand by the register and wait","Walk around or chat with a coworker","Take a break since it is slow","Find something to clean, organize, or restock — never stand around"],answer:"Find something to clean, organize, or restock — never stand around"},
   {q:"What is the employee discount?",type:"mc",options:["20% off your entire order any time","50% off food on your day off plus a free drink","50% off kitchen or ice cream on the day you work, free beverage from the soda machine using your employee cup, and free french fries","Free meal every shift, no restrictions"],answer:"50% off kitchen or ice cream on the day you work, free beverage from the soda machine using your employee cup, and free french fries"},
   {q:"Your family or friends come to visit while you are working. What do you do?",type:"mc",options:["Give them whatever they want — you work here","Tell them to come back another time","Ask a manager to comp their meal","Give them 10% off their order"],answer:"Give them 10% off their order"},
-  {q:"What should you do if there is a fire in the kitchen?",type:"mc",options:["Pour water on any fire immediately","Run and find a manager right away","Always use the fire extinguisher regardless of size","Small grill fires: tiny controlled squirts of water. Large grease fires should not use large amounts of water as it can splash the flames and spread them — use the red fire blanket or small amounts of salt to smother the flame. Stay on your position and practice good grill management"],answer:"Small grill fires: tiny controlled squirts of water. Large grease fires should not use large amounts of water as it can splash the flames and spread them — use the red fire blanket or small amounts of salt to smother the flame. Stay on your position and practice good grill management"}
+  {q:"What should you do if there is a fire in the kitchen?",type:"mc",options:["Pour water on any fire immediately","Run and find a manager right away","Always use the fire extinguisher regardless of size","Small grill fires: tiny controlled squirts of water. Large grease fires should not use large amounts of water as it can splash the flames and spread them — use the red fire blanket or small amounts of salt to smother the flame. Stay on your position and practice good grill management"],answer:"Small grill fires: tiny controlled squirts of water. Large grease fires should not use large amounts of water as it can splash the flames and spread them — use the red fire blanket or small amounts of salt to smother the flame. Stay on your position and practice good grill management"},
+  {q:"Deck windows must always be in one of two positions. What are they and why?",type:"mc",options:["Open or closed — to control temperature","Fully up and strapped OR fully down and buttoned — the wind will make them flap, ruining them and potentially hurting a customer","Halfway up for ventilation on hot days","It doesn't matter as long as they look presentable"],answer:"Fully up and strapped OR fully down and buttoned — the wind will make them flap, ruining them and potentially hurting a customer"}
 ];
 
 const KITCHEN_ONLY = [
@@ -442,7 +445,8 @@ const REGISTER_ONLY = [
   {q:"Why is it important to explain the milkshake process to the customer?",type:"mc",options:["So they leave a better tip","So they don't get frustrated thinking they have to wait in a second line","It's a health code requirement","So they know it's freshly made"],answer:"So they don't get frustrated thinking they have to wait in a second line"},
   {q:"A customer looks confused after ordering a milkshake and starts walking toward the exit. What do you do?",type:"mc",options:["Let them go — they'll figure it out","Call out to them and proactively explain the caboose process before they leave","Page a manager","Tell the next customer in line"],answer:"Call out to them and proactively explain the caboose process before they leave"},
   {q:"A customer asks for a refund. What do you do?",type:"mc",options:["Process it immediately to avoid a scene","Tell them no refunds","Get a manager — never process a refund or make a promise without manager approval","Offer store credit instead"],answer:"Get a manager — never process a refund or make a promise without manager approval"},
-  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not register staff"],answer:"As the very last step — the person counting them must be off the clock"}
+  {q:"When do tips get counted?",type:"mc",options:["At the start of the next shift","During closing while everything else is being done","As the very last step — the person counting them must be off the clock","Managers count tips, not register staff"],answer:"As the very last step — the person counting them must be off the clock"},
+  {q:"Why must deck windows be either fully up and strapped or fully down and buttoned?",type:"mc",options:["So the restaurant looks neat from the outside","Because the wind will make them blow up and down — ruining the windows and potentially hurting a customer","To keep bugs out of the dining area","It's a fire code requirement"],answer:"Because the wind will make them blow up and down — ruining the windows and potentially hurting a customer"}
 ];
 
 const CABOOSE_ONLY = [
